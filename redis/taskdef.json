@@ -1,0 +1,27 @@
+{
+  "family": "${CLUSTER}-redis",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "redis",
+      "image": "redis:7.0",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 6379, "protocol": "tcp"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/redis",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "redis"
+        }
+      }
+    }
+  ]
+}

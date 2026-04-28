@@ -1,0 +1,43 @@
+{
+  "family": "${CLUSTER}-payment",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "payment",
+      "image": "bsathi2020/payment:v1",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 8080, "protocol": "tcp"}
+      ],
+      "environment": [
+        {"name": "CART_HOST", "value": "cart.roboshop.local"},
+        {"name": "CART_PORT", "value": "8080"},
+        {"name": "USER_HOST", "value": "user.roboshop.local"},
+        {"name": "USER_PORT", "value": "8080"},
+        {"name": "AMQP_HOST", "value": "rabbitmq.roboshop.local"},
+        {"name": "AMQP_USER", "value": "roboshop"},
+        {"name": "AMQP_PASS", "value": "roboshop123"}
+      ],
+      "healthCheck": {
+        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
+        "interval":    15,
+        "timeout":     5,
+        "retries":     3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/payment",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "payment"
+        }
+      }
+    }
+  ]
+}

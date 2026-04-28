@@ -1,0 +1,31 @@
+{
+  "family": "${CLUSTER}-frontend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "frontend",
+      "image": "bsathi2020/frontend:v1",
+      "essential": true,
+      "command": [
+        "sh", "-c",
+        "echo '${NGINX_CONF_B64}' | base64 -d > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+      ],
+      "portMappings": [
+        {"containerPort": 8080, "protocol": "tcp"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/frontend",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "frontend"
+        }
+      }
+    }
+  ]
+}

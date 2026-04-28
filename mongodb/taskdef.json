@@ -1,0 +1,27 @@
+{
+  "family": "${CLUSTER}-mongodb",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "mongodb",
+      "image": "bsathi2020/mongodb:v1",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 27017, "protocol": "tcp"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/mongodb",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "mongodb"
+        }
+      }
+    }
+  ]
+}

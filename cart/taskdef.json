@@ -1,0 +1,39 @@
+{
+  "family": "${CLUSTER}-cart",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "cart",
+      "image": "bsathi2020/cart:v1",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 8080, "protocol": "tcp"}
+      ],
+      "environment": [
+        {"name": "REDIS_HOST",     "value": "redis.roboshop.local"},
+        {"name": "CATALOGUE_HOST", "value": "catalogue.roboshop.local"},
+        {"name": "CATALOGUE_PORT", "value": "8080"}
+      ],
+      "healthCheck": {
+        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
+        "interval":    15,
+        "timeout":     5,
+        "retries":     3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/cart",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "cart"
+        }
+      }
+    }
+  ]
+}

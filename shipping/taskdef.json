@@ -1,0 +1,38 @@
+{
+  "family": "${CLUSTER}-shipping",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "shipping",
+      "image": "bsathi2020/shipping:v1",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 8080, "protocol": "tcp"}
+      ],
+      "environment": [
+        {"name": "CART_ENDPOINT", "value": "cart.roboshop.local:8080"},
+        {"name": "DB_HOST",       "value": "mysql.roboshop.local"}
+      ],
+      "healthCheck": {
+        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
+        "interval":    30,
+        "timeout":     10,
+        "retries":     3,
+        "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/shipping",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "shipping"
+        }
+      }
+    }
+  ]
+}

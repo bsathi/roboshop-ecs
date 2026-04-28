@@ -1,0 +1,38 @@
+{
+  "family": "${CLUSTER}-catalogue",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "catalogue",
+      "image": "bsathi2020/catalogue:v1",
+      "essential": true,
+      "portMappings": [
+        {"containerPort": 8080, "protocol": "tcp"}
+      ],
+      "environment": [
+        {"name": "MONGO",    "value": "true"},
+        {"name": "MONGO_URL","value": "mongodb://mongodb.roboshop.local:27017/catalogue"}
+      ],
+      "healthCheck": {
+        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
+        "interval":    15,
+        "timeout":     5,
+        "retries":     3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/${CLUSTER}/catalogue",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "catalogue"
+        }
+      }
+    }
+  ]
+}

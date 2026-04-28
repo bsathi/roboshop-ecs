@@ -1,0 +1,8 @@
+# Normalize all text files to LF in the repo, check out as-is on Windows
+* text=auto eol=lf
+
+# Shell scripts must be LF on all platforms
+*.sh text eol=lf
+
+# JSON task definitions
+*.json text eol=lf
