@@ -68,7 +68,7 @@ if [[ -z "$EXISTING" ]]; then
     --task-definition "$TASK_DEF_ARN" \
     --desired-count 1 \
     --launch-type FARGATE \
-    --network-configuration "awsvpcConfiguration={subnets=[${PRIVATE_SUBNETS}],securityGroups=[${FRONTEND_SG_ID}],assignPublicIp=DISABLED}" \
+    --network-configuration "awsvpcConfiguration={subnets=[${PRIVATE_SUBNETS}],securityGroups=[${FRONTEND_SG_ID}],assignPublicIp=ENABLED}" \
     --load-balancers "targetGroupArn=${TG_ARN},containerName=frontend,containerPort=8080" \
     --health-check-grace-period-seconds 60 \
     --region "$REGION" > /dev/null

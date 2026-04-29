@@ -49,7 +49,7 @@ if [[ -z "$EXISTING" ]]; then
     --task-definition "$TASK_DEF_ARN" \
     --desired-count 1 \
     --launch-type FARGATE \
-    --network-configuration "awsvpcConfiguration={subnets=[${PRIVATE_SUBNETS}],securityGroups=[${APP_SG_ID}],assignPublicIp=DISABLED}" \
+    --network-configuration "awsvpcConfiguration={subnets=[${PRIVATE_SUBNETS}],securityGroups=[${APP_SG_ID}],assignPublicIp=ENABLED}" \
     --service-registries "registryArn=${SD_ARN}" \
     --region "$REGION" > /dev/null
   echo "  ✓ Service created: $SERVICE_NAME"
