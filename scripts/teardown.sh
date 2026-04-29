@@ -112,6 +112,15 @@ if [[ -n "$VPC_ID" ]]; then
         aws ec2 revoke-security-group-ingress --group-id "$SG_ID" \
           --ip-permissions "$RULES" --region "$REGION" 2>/dev/null || true
       fi
+      # Delete any leftover available ENIs referencing this SG (ALB/ECS cleanup lag)
+      aws ec2 describe-network-interfaces \
+        --filters "Name=group-id,Values=${SG_ID}" "Name=status,Values=available" \
+        --query 'NetworkInterfaces[*].NetworkInterfaceId' \
+        --output text --region "$REGION" 2>/dev/null | \
+        tr '\t' '\n' | grep -v '^$' | while read ENI_ID; do
+          aws ec2 delete-network-interface \
+            --network-interface-id "$ENI_ID" --region "$REGION" 2>/dev/null || true
+        done
       aws ec2 delete-security-group --group-id "$SG_ID" --region "$REGION"
       echo "  ✓ $SG_NAME ($SG_ID)"
     else
