@@ -19,13 +19,6 @@
         {"name": "CATALOGUE_HOST", "value": "catalogue.roboshop.local"},
         {"name": "CATALOGUE_PORT", "value": "8080"}
       ],
-      "healthCheck": {
-        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
-        "interval":    15,
-        "timeout":     5,
-        "retries":     3,
-        "startPeriod": 30
-      },
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {

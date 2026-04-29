@@ -23,13 +23,6 @@
         {"name": "AMQP_USER", "value": "roboshop"},
         {"name": "AMQP_PASS", "value": "roboshop123"}
       ],
-      "healthCheck": {
-        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
-        "interval":    15,
-        "timeout":     5,
-        "retries":     3,
-        "startPeriod": 30
-      },
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {

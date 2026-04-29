@@ -18,13 +18,6 @@
         {"name": "CART_ENDPOINT", "value": "cart.roboshop.local:8080"},
         {"name": "DB_HOST",       "value": "mysql.roboshop.local"}
       ],
-      "healthCheck": {
-        "command":     ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"],
-        "interval":    30,
-        "timeout":     10,
-        "retries":     3,
-        "startPeriod": 60
-      },
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
