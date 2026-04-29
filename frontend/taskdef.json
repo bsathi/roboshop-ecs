@@ -11,8 +11,8 @@
       "name": "frontend",
       "image": "bsathi2020/frontend:v1",
       "essential": true,
+      "entryPoint": ["sh", "-c"],
       "command": [
-        "sh", "-c",
         "echo '${NGINX_CONF_B64}' | base64 -d > /tmp/nginx.conf && nginx -c /tmp/nginx.conf -g 'daemon off;'"
       ],
       "portMappings": [
