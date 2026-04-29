@@ -105,8 +105,17 @@ if [[ -n "$VPC_ID" ]]; then
       --filters "Name=group-name,Values=${SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" \
       --query 'SecurityGroups[0].GroupId' --output text --region "$REGION" 2>/dev/null || echo "")
     if [[ -n "$SG_ID" && "$SG_ID" != "None" ]]; then
-      aws ec2 delete-security-group --group-id "$SG_ID" --region "$REGION" 2>/dev/null || true
+      # Revoke all inbound rules first — cross-SG references block deletion
+      RULES=$(aws ec2 describe-security-groups --group-ids "$SG_ID" \
+        --query 'SecurityGroups[0].IpPermissions' --output json --region "$REGION" 2>/dev/null || echo "[]")
+      if [[ "$RULES" != "[]" ]]; then
+        aws ec2 revoke-security-group-ingress --group-id "$SG_ID" \
+          --ip-permissions "$RULES" --region "$REGION" 2>/dev/null || true
+      fi
+      aws ec2 delete-security-group --group-id "$SG_ID" --region "$REGION"
       echo "  ✓ $SG_NAME ($SG_ID)"
+    else
+      echo "  - Skipped (not found): $SG_NAME"
     fi
   done
 fi
