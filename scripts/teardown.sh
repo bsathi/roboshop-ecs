@@ -150,10 +150,13 @@ SSM_PARAMS=$(aws ssm get-parameters-by-path \
   --region "$REGION" 2>/dev/null || echo "")
 
 if [[ -n "$SSM_PARAMS" ]]; then
-  aws ssm delete-parameters \
-    --names $SSM_PARAMS \
-    --region "$REGION" > /dev/null
-  echo "  ✓ SSM parameters removed: $(echo $SSM_PARAMS | tr '\t' ' ')"
+  read -ra PARAM_ARRAY <<< "$SSM_PARAMS"
+  TOTAL=${#PARAM_ARRAY[@]}
+  for ((i=0; i<TOTAL; i+=10)); do
+    BATCH=("${PARAM_ARRAY[@]:i:10}")
+    aws ssm delete-parameters --names "${BATCH[@]}" --region "$REGION" > /dev/null
+  done
+  echo "  ✓ SSM parameters removed ($TOTAL total)"
 else
   echo "  - No SSM parameters found under /${PROJECT}/${ENV}"
 fi
