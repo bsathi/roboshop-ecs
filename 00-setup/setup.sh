@@ -99,9 +99,9 @@ _get_or_create_sg() {
     id=$(aws ec2 create-security-group \
       --group-name "$name" --description "$desc" --vpc-id "$VPC_ID" \
       --query GroupId --output text --region "$REGION")
-    echo "  ✓ Created: $name ($id)"
+    echo "  ✓ Created: $name ($id)" >&2
   else
-    echo "  ✓ Exists : $name ($id)"
+    echo "  ✓ Exists : $name ($id)" >&2
   fi
   echo "$id"
 }
