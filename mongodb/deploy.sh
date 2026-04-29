@@ -32,12 +32,12 @@ SD_ARN=$(aws ssm get-parameter \
 
 # Register task definition (substitutes ${CLUSTER}, ${REGION}, ${EXEC_ROLE_ARN}, ${TASK_ROLE_ARN})
 echo "  Registering task definition..."
-TASK_DEF_ARN=$(envsubst '${CLUSTER} ${REGION} ${EXEC_ROLE_ARN} ${TASK_ROLE_ARN}' \
-  < "$(dirname "$0")/taskdef.json" \
-  | aws ecs register-task-definition \
-      --cli-input-json file:///dev/stdin \
-      --region "$REGION" \
-      --query 'taskDefinition.taskDefinitionArn' --output text)
+TASK_JSON=$(envsubst '${CLUSTER} ${REGION} ${EXEC_ROLE_ARN} ${TASK_ROLE_ARN}' \
+  < "$(dirname "$0")/taskdef.json")
+TASK_DEF_ARN=$(aws ecs register-task-definition \
+  --cli-input-json "$TASK_JSON" \
+  --region "$REGION" \
+  --query 'taskDefinition.taskDefinitionArn' --output text)
 echo "  ✓ $TASK_DEF_ARN"
 
 # Create service on first deploy, update on subsequent deploys
