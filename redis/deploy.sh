@@ -57,6 +57,7 @@ else
   aws ecs update-service \
     --cluster "$CLUSTER" --service "$SERVICE_NAME" \
     --task-definition "$TASK_DEF_ARN" \
+    --desired-count 1 \
     --region "$REGION" > /dev/null
   echo "  ✓ Service updated: $SERVICE_NAME"
 fi
