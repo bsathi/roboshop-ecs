@@ -105,12 +105,19 @@ if [[ -n "$VPC_ID" ]]; then
       --filters "Name=group-name,Values=${SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" \
       --query 'SecurityGroups[0].GroupId' --output text --region "$REGION" 2>/dev/null || echo "")
     if [[ -n "$SG_ID" && "$SG_ID" != "None" ]]; then
-      # Revoke all inbound rules first — cross-SG references block deletion
-      RULES=$(aws ec2 describe-security-groups --group-ids "$SG_ID" \
+      # Revoke all inbound rules — cross-SG references block deletion
+      INGRESS=$(aws ec2 describe-security-groups --group-ids "$SG_ID" \
         --query 'SecurityGroups[0].IpPermissions' --output json --region "$REGION" 2>/dev/null || echo "[]")
-      if [[ "$RULES" != "[]" ]]; then
+      if [[ "$INGRESS" != "[]" ]]; then
         aws ec2 revoke-security-group-ingress --group-id "$SG_ID" \
-          --ip-permissions "$RULES" --region "$REGION" 2>/dev/null || true
+          --ip-permissions "$INGRESS" --region "$REGION" 2>/dev/null || true
+      fi
+      # Revoke all outbound rules — default egress rule can also block deletion
+      EGRESS=$(aws ec2 describe-security-groups --group-ids "$SG_ID" \
+        --query 'SecurityGroups[0].IpPermissionsEgress' --output json --region "$REGION" 2>/dev/null || echo "[]")
+      if [[ "$EGRESS" != "[]" ]]; then
+        aws ec2 revoke-security-group-egress --group-id "$SG_ID" \
+          --ip-permissions "$EGRESS" --region "$REGION" 2>/dev/null || true
       fi
       # Delete any leftover available ENIs referencing this SG (ALB/ECS cleanup lag)
       aws ec2 describe-network-interfaces \
