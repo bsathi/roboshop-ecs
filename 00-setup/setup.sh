@@ -106,7 +106,7 @@ _get_or_create_sg() {
   echo "$id"
 }
 
-ALB_SG_ID=$(_get_or_create_sg      "${CLUSTER}-alb-sg"      "Roboshop ALB — HTTP 80 from internet")
+ALB_SG_ID=$(_get_or_create_sg      "${CLUSTER}-alb-sg"      "Roboshop ALB - HTTP 80 from internet")
 FRONTEND_SG_ID=$(_get_or_create_sg "${CLUSTER}-frontend-sg" "Roboshop frontend nginx container")
 APP_SG_ID=$(_get_or_create_sg      "${CLUSTER}-app-sg"      "Roboshop app services")
 DATA_SG_ID=$(_get_or_create_sg     "${CLUSTER}-data-sg"     "Roboshop data services")
