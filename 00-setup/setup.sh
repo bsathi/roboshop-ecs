@@ -43,8 +43,8 @@ PUBLIC_SUBNETS=$(aws ssm get-parameter \
   --query Parameter.Value --output text --region "$REGION")
 
 echo "VPC         : $VPC_ID"
-echo "Private SNs : $PRIVATE_SUBNETS"
-echo "Public SNs  : $PUBLIC_SUBNETS"
+echo "ECS Task SNs: $PRIVATE_SUBNETS"
+echo "ALB SNs     : $PUBLIC_SUBNETS"
 echo ""
 
 # ── 1. IAM Roles ─────────────────────────────────────────────────────────────
