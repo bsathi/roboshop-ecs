@@ -121,8 +121,11 @@ if [[ -n "$VPC_ID" ]]; then
           aws ec2 delete-network-interface \
             --network-interface-id "$ENI_ID" --region "$REGION" 2>/dev/null || true
         done
-      aws ec2 delete-security-group --group-id "$SG_ID" --region "$REGION"
-      echo "  ✓ $SG_NAME ($SG_ID)"
+      if aws ec2 delete-security-group --group-id "$SG_ID" --region "$REGION" 2>/dev/null; then
+        echo "  ✓ $SG_NAME ($SG_ID)"
+      else
+        echo "  ✗ Could not delete $SG_NAME ($SG_ID) — delete manually after ENIs are released"
+      fi
     else
       echo "  - Skipped (not found): $SG_NAME"
     fi
