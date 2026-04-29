@@ -142,30 +142,21 @@ echo "  ✓ /ecs/${CLUSTER}/<all components>"
 # ── 8. Clean up SSM Parameters ────────────────────────────────────────────────
 echo ""
 echo "── 8. Removing SSM Parameters"
-aws ssm delete-parameters \
-  --names \
-    "/${PROJECT}/${ENV}/cluster_name" \
-    "/${PROJECT}/${ENV}/execution_role_arn" \
-    "/${PROJECT}/${ENV}/task_role_arn" \
-    "/${PROJECT}/${ENV}/alb_sg_id" \
-    "/${PROJECT}/${ENV}/frontend_sg_id" \
-    "/${PROJECT}/${ENV}/app_sg_id" \
-    "/${PROJECT}/${ENV}/data_sg_id" \
-    "/${PROJECT}/${ENV}/cloudmap_ns_id" \
-    "/${PROJECT}/${ENV}/cloudmap_ns_name" \
-    "/${PROJECT}/${ENV}/alb_dns" \
-    "/${PROJECT}/${ENV}/alb_target_group_arn" \
-    "/${PROJECT}/${ENV}/sd/mongodb_arn" \
-    "/${PROJECT}/${ENV}/sd/redis_arn" \
-    "/${PROJECT}/${ENV}/sd/mysql_arn" \
-    "/${PROJECT}/${ENV}/sd/rabbitmq_arn" \
-    "/${PROJECT}/${ENV}/sd/catalogue_arn" \
-    "/${PROJECT}/${ENV}/sd/cart_arn" \
-    "/${PROJECT}/${ENV}/sd/user_arn" \
-    "/${PROJECT}/${ENV}/sd/payment_arn" \
-    "/${PROJECT}/${ENV}/sd/shipping_arn" \
-  --region "$REGION" > /dev/null 2>&1 || true
-echo "  ✓ SSM parameters removed"
+SSM_PARAMS=$(aws ssm get-parameters-by-path \
+  --path "/${PROJECT}/${ENV}" \
+  --recursive \
+  --query 'Parameters[*].Name' \
+  --output text \
+  --region "$REGION" 2>/dev/null || echo "")
+
+if [[ -n "$SSM_PARAMS" ]]; then
+  aws ssm delete-parameters \
+    --names $SSM_PARAMS \
+    --region "$REGION" > /dev/null
+  echo "  ✓ SSM parameters removed: $(echo $SSM_PARAMS | tr '\t' ' ')"
+else
+  echo "  - No SSM parameters found under /${PROJECT}/${ENV}"
+fi
 
 echo ""
 echo "================================================================"
